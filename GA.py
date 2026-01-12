@@ -299,22 +299,31 @@ if st.sidebar.button("Run GA"):
     st.success(f"Best Fitness Score: {best_score:.2f}")
     st.info(f"Computation Time: {run_time:.2f} seconds")
 
-    # Fitness Convergence 
+    # Fitness Convergence with "Evolutionary Cloud"
     iters = [x["iteration"] for x in fitness_history]
     best_vals = [x["best"] for x in fitness_history]
     mean_vals = [x["mean"] for x in fitness_history]
+    worst_vals = [x["worst"] for x in fitness_history]
 
+    st.subheader("🧬 Evolutionary Progress")
     fig, ax = plt.subplots()
-    ax.plot(iters, best_vals, color='blue', label="Best Fitness")
-    ax.plot(iters, mean_vals, color='orange', linestyle='--', label="Avg Fitness")
+    
+    # Plot the "Cloud" (Diversity of Population)
+    ax.fill_between(iters, best_vals, worst_vals, color='green', alpha=0.1, label="Population Spread")
+    
+    # Plot Lines
+    ax.plot(iters, mean_vals, color='green', linestyle='--', alpha=0.6, label="Average Fitness")
+    ax.plot(iters, best_vals, color='darkgreen', linewidth=2, label="Best Fitness")
     
     # Highlight Stop
-    ax.axvline(iters[-1], color='green', linestyle='--', label="Stop")
+    if len(iters) < n_generations:
+        ax.axvline(iters[-1], color='red', linestyle=':', label="Early Stop")
     
     ax.set_xlabel("Generation")
-    ax.set_ylabel("Fitness (Penalty)")
-    ax.set_title("Genetic Algorithm Convergence")
+    ax.set_ylabel("Penalty Score")
+    ax.set_title("Genetic Evolution (Population Convergence)")
     ax.legend()
+    ax.grid(True, alpha=0.3)
     st.pyplot(fig)
 
     # Fitness Breakdown
